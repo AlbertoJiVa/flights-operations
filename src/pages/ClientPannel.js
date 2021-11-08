@@ -22,19 +22,21 @@ const ClientPannel = ({ user, signOut, ...props }) => {
             id: doc.id,
           }));
 
-          let prevFlightIds = JSON.parse(localStorage.getItem("flights")).map(
-            (f) => f.id
-          );
-          let nextFlightIds = data.map((f) => f.id);
-          let newFlightId = nextFlightIds.filter(
-            (nF) => !prevFlightIds.includes(nF)
-          );
+          let loadedFlights = JSON.parse(localStorage.getItem("flights"));
 
-          let flight = data.find((f) => f.id === newFlightId[0]);
+          if (loadedFlights) {
+            let prevFlightIds = loadedFlights.map((f) => f.id);
+            let nextFlightIds = data.map((f) => f.id);
+            let newFlightId = nextFlightIds.filter(
+              (nF) => !prevFlightIds.includes(nF)
+            );
 
-          if (flight) {
-            setNewFlight(flight);
-            setOpen(true);
+            let flight = data.find((f) => f.id === newFlightId[0]);
+
+            if (flight) {
+              setNewFlight(flight);
+              setOpen(true);
+            }
           }
 
           setFlights(data);
