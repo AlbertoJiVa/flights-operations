@@ -1,9 +1,12 @@
 import { useState, useEffect } from "react";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import firebase from "firebase/compat/app";
 import "firebase/compat/auth";
 import "firebase/compat/firestore";
-import Button from "./components/Button";
-import ControlPannel from "./components/ControlPannel";
+import ClientPannel from "./pages/ClientPannel";
+import SelectRole from "./pages/SelectRole";
+import CreateFlight from "./pages/CreateFlight";
+import SignIn from "./pages/SignIn";
 
 const firebaseConfig = {
   apiKey: "AIzaSyALUg__W8Lj02ODBwOR3x9bWhCsxW7q-vg",
@@ -17,7 +20,6 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 
 const auth = firebase.auth();
-const db = firebase.firestore();
 
 function App() {
   const [user, setUser] = useState(() => auth.currentUser);
@@ -52,7 +54,7 @@ function App() {
 
   const signOut = async () => {
     try {
-      auth.signOut();
+      await auth.signOut();
     } catch (error) {
       console.error(error);
     }
@@ -61,17 +63,28 @@ function App() {
   if (initializing) return "Loading ...";
 
   return (
-    <div>
-      {user ? (
-        <>
-          <ControlPannel user={user} db={db} />
-          <br />
-          <Button onClick={signOut}>Sign Out</Button>
-        </>
-      ) : (
-        <Button onClick={signInWithGoogle}>Sign in with Google</Button>
-      )}
-    </div>
+    <BrowserRouter>
+      <Routes>
+        <Route
+          path="/"
+          element={
+            user ? (
+              <SelectRole signOut={signOut} />
+            ) : (
+              <SignIn signInWithGoogle={signInWithGoogle} />
+            )
+          }
+        />
+        <Route
+          path="client"
+          element={<ClientPannel user={user} signOut={signOut} />}
+        />
+        <Route
+          path="operator"
+          element={<CreateFlight user={user} signOut={signOut} />}
+        />
+      </Routes>
+    </BrowserRouter>
   );
 }
 
